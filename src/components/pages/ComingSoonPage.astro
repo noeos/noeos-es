@@ -1,0 +1,39 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { alternateLocales, getDictionary, type Locale } from '../../i18n';
+import { getLocalizedRoute } from '../../i18n/routes';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const dictionary = getDictionary(locale);
+const alternateLocale = alternateLocales[locale];
+---
+
+<SiteLayout
+  locale={locale}
+  title={dictionary.pageTitle}
+  description={dictionary.pageDescription}
+>
+  <div class="flex min-h-svh flex-col">
+    <header class="flex justify-end p-6 sm:p-8">
+      <nav aria-label={dictionary.languageNavigation}>
+        <a
+          class="rounded-sm text-sm font-medium underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"
+          href={getLocalizedRoute('home', alternateLocale)}
+          lang={alternateLocale}
+          hreflang={alternateLocale}
+        >
+          {dictionary.switchLanguage}
+        </a>
+      </nav>
+    </header>
+    <main class="grid flex-1 place-items-center px-6">
+      <h1 class="text-center text-3xl font-medium tracking-tight sm:text-5xl">
+        {dictionary.comingSoon}
+      </h1>
+    </main>
+  </div>
+</SiteLayout>
