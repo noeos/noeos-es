@@ -21,7 +21,7 @@ La revisión manual es necesaria, pero no debería gastar atención en diferenci
 
 ## Consecuencias
 
-- Los scripts de formato, lint, tipado, build y pruebas se definirán al inicializar el proyecto y podrán ejecutarse localmente y en la integración continua.
+- Los scripts de formato, lint, tipado y build, y su ejecución en CI, se definen en ADR-0014. Las pruebas se incorporarán junto al comportamiento que deban proteger.
 - La selección de la toolchain, el flujo de CI y los checks requeridos de GitHub se definen en ADR-0014.
 - La suite crecerá junto a los comportamientos reales del sitio, sin añadir frameworks o pruebas vacías antes de tener código que proteger.
 - Las reglas automáticas harán cumplir errores objetivos; el juicio humano seguirá evaluando la claridad, la semántica y la composición visual.

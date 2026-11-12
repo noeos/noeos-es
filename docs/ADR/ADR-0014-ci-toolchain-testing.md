@@ -9,26 +9,27 @@
 
 El proyecto necesita una forma reproducible de trabajar localmente y de comprobar cada cambio antes de integrarlo. Las reglas de formato, análisis estático, semántica de pruebas y revisión visual están en ADR-0009. Este ADR decide cómo fijar las herramientas, automatizar esos checks con GitHub Actions, proteger las ramas y ejecutar pruebas sin añadir infraestructura que el comportamiento actual todavía no necesita.
 
-El checkout está ahora en reconstrucción y no tiene código de aplicación, `package.json` ni workflows. Estas decisiones se aplicarán cuando se inicialice de nuevo el proyecto; no describen checks ya instalados ni habilitan cambios en configuración del repositorio GitHub por sí solas.
+El checkout estaba en reconstrucción y no tenía código de aplicación, `package.json` ni workflows. Este ADR define la inicialización aplicada al toolchain y la configuración de CI para el repositorio de GitHub.
 
 ## Decisión
 
 ### Toolchain reproducible
 
-- Se mantendrán Astro, TypeScript estricto, Tailwind CSS y npm conforme a los ADR de arquitectura existentes, salvo que un ADR posterior cambie esa decisión.
-- Al inicializar el proyecto se elegirá una versión Active LTS o Maintenance LTS de Node.js que sea compatible con Astro y las herramientas. Se fijará la versión exacta en `.node-version`; `package.json` declarará la compatibilidad mediante `engines` y fijará el gestor y su versión en `packageManager` cuando la versión de npm elegida lo permita.
-- CI leerá la misma versión fijada en `.node-version`, no una etiqueta móvil como `latest` o `lts/*`. La elección se revisará al adoptar una nueva LTS, ante avisos de fin de soporte o seguridad, y durante la actualización planificada del toolchain. No se fijará aquí un número de versión que vaya a quedarse obsoleto.
+- Se mantienen Astro, TypeScript estricto, Tailwind CSS y npm conforme a los ADR de arquitectura existentes, salvo que un ADR posterior cambie esa decisión.
+- El toolchain inicial fija Node.js `24.22.3` en `.node-version` y npm `12.2.2` en `packageManager` y `engines`. `npm ci` aplica el lockfile y `.npmrc` rechaza versiones incompatibles.
+- CI lee la misma versión fijada en `.node-version`, no una etiqueta móvil como `latest` o `lts/*`. La versión se revisará al adoptar una nueva LTS, ante avisos de fin de soporte o seguridad, y durante la actualización planificada del toolchain.
 - `package-lock.json` se versionará y se actualizará junto con los cambios intencionales de dependencias. CI instalará con `npm ci` para reproducir ese lockfile; las instalaciones locales usarán comandos que respeten el lockfile.
-- Las versiones de Astro, TypeScript, lint, formato y pruebas se declararán en los manifiestos y configuración del repositorio. Las actualizaciones se revisarán como cambios y se mantendrán compatibles entre sí.
-- Los scripts de `package.json` tendrán nombres y propósito estables para ejecución local y CI. Como mínimo, el proyecto expondrá checks equivalentes a formato sin escritura, lint, diagnósticos/tipos Astro, build de producción y la suite de pruebas existente. Los comandos concretos se documentarán en README cuando se cree el entorno ejecutable.
+- Las versiones de Astro, TypeScript, lint, formato y pruebas se declaran en los manifiestos y configuración del repositorio. Las actualizaciones se revisarán como cambios y se mantendrán compatibles entre sí.
+- El workflow actual ejecuta formato, ESLint, `astro check`, build de producción y `npm audit --audit-level=high`. Las dependencias npm y las acciones se revisan semanalmente mediante Dependabot; esto abre propuestas de actualización, no las integra automáticamente. En el repositorio están activados secret scanning, push protection y las alertas de seguridad de Dependabot.
+- Los scripts de `package.json` tienen nombres y propósito estables para ejecución local y CI. Como mínimo, el proyecto expone checks equivalentes a formato sin escritura, lint, diagnósticos/tipos Astro, build de producción y la suite de pruebas existente. Los comandos locales están documentados en README.
 
 ### Flujo de integración continua
 
-- GitHub Actions será el proveedor CI inicial. Los workflows vivirán como código en `.github/workflows/`, serán pequeños y tendrán nombres estables para que GitHub pueda exigir sus checks.
-- Los checks de calidad se ejecutarán en `pull_request` hacia la rama principal y en `push` a la rama principal. Si se habilita una merge queue, se añadirá el evento `merge_group` a los workflows cuyos checks sean requeridos.
+- GitHub Actions es el proveedor CI inicial. Los workflows viven como código en `.github/workflows/`, son pequeños y tienen nombres estables para que GitHub pueda exigir sus checks.
+- Los checks se ejecutan en `pull_request` hacia `main`, `push` a `main` y `merge_group`.
 - Los checks requeridos no usarán filtros de rutas que puedan hacer que una pull request no informe el estado esperado. Se evitarán jobs condicionales que se omitan bajo cambios ordinarios; si un job es opcional, no será el único check que proteja la integración.
-- El flujo mínimo instalará la toolchain fijada, ejecutará `npm ci` y los checks definidos por ADR-0009 y la suite disponible. `format:check` no modificará archivos. El build se comprobará sobre el código que se propone integrar.
-- Los jobs serán deterministas y tendrán límites de tiempo razonables. Los runs obsoletos de la misma rama podrán cancelarse. Los fallos se investigarán; no se normalizarán reintentos automáticos indefinidos ni se ocultarán checks fallidos.
+- El flujo instala la toolchain fijada, ejecuta `npm ci` y los checks definidos por ADR-0009 y la suite disponible. `format:check` no modifica archivos. El build se comprueba sobre el código que se propone integrar.
+- El workflow `CI` usa un job estable llamado `quality`, un límite de 15 minutos y cancela ejecuciones obsoletas de la misma referencia. Los fallos se investigarán; no se normalizarán reintentos automáticos indefinidos ni se ocultarán checks fallidos.
 - La caché es una optimización, nunca la fuente de verdad. Se invalidará por lockfile y versión de herramienta cuando corresponda, no incluirá secretos y se tratará como entrada no confiable. CI debe seguir siendo correcto con una caché vacía.
 - Despliegue y publicación no se mezclarán con checks de pull request. Si más adelante se automatizan, se usarán entornos protegidos, aprobación cuando corresponda y secretos con privilegios mínimos; una pull request no podrá desplegar código no revisado.
 
@@ -43,10 +44,11 @@ El checkout está ahora en reconstrucción y no tiene código de aplicación, `p
 
 ### Checks de GitHub y protección de rama
 
-- Cuando el proyecto vuelva a tener código, la rama principal se protegerá para recibir cambios mediante pull requests y requerir el check de CI de calidad antes de integrar. Los checks requeridos se seleccionarán por su nombre estable y, si es posible, por la GitHub App que los publica.
+- La rama principal se protegerá para recibir cambios mediante pull requests y requerir el check de CI de calidad antes de integrar. Los checks requeridos se seleccionarán por su nombre estable y, si es posible, por la GitHub App que los publica.
 - No se permitirá que una condición omitida, workflow filtrado o nombre de job renombrado deje la rama bloqueada indefinidamente o permita integrar código sin validación. Los cambios al workflow de checks se revisarán como cambios de seguridad y disponibilidad del proceso.
-- Se mantendrá al menos una revisión humana del diff según el flujo de trabajo acordado. Los checks automáticos apoyan la revisión; no reemplazan el juicio técnico ni autorizan por sí solos decisiones de producto, diseño, accesibilidad o contenido.
-- Las reglas de rama, permisos de Actions y configuración de merge queue son ajustes alojados en GitHub. Este ADR define el estado deseado; habrá que configurarlos y comprobarlos en el repositorio cuando se acuerde su activación.
+- No se exigirán revisores ni aprobaciones humanas para integrar cambios. El proyecto lo mantiene una sola persona y la protección de la rama se basará en los checks automatizados requeridos. Esto no elimina la responsabilidad de quien mantiene el proyecto de decidir qué cambios integrar.
+- Las reglas de rama, permisos de Actions y configuración de merge queue son ajustes alojados en GitHub. El estado deseado es exigir los checks automatizados de CI en `main`, mediante pull request y sin aprobaciones ni revisores. El check requerido tendrá el nombre estable `quality`; las aprobaciones requeridas serán cero.
+- La regla de protección todavía no está activa: primero el workflow debe formar parte de `main` para que GitHub publique el check requerido. Tras integrar esta inicialización, se configurará la protección de rama y se comprobará que un PR solo pueda integrarse cuando `quality` pase. Los workflows por sí solos no activan esta protección.
 
 ### Estrategia de pruebas
 
