@@ -48,7 +48,7 @@ El checkout estaba en reconstrucción y no tenía código de aplicación, `packa
 - No se permitirá que una condición omitida, workflow filtrado o nombre de job renombrado deje la rama bloqueada indefinidamente o permita integrar código sin validación. Los cambios al workflow de checks se revisarán como cambios de seguridad y disponibilidad del proceso.
 - No se exigirán revisores ni aprobaciones humanas para integrar cambios. El proyecto lo mantiene una sola persona y la protección de la rama se basará en los checks automatizados requeridos. Esto no elimina la responsabilidad de quien mantiene el proyecto de decidir qué cambios integrar.
 - Las reglas de rama, permisos de Actions y configuración de merge queue son ajustes alojados en GitHub. El estado deseado es exigir los checks automatizados de CI en `main`, mediante pull request y sin aprobaciones ni revisores. El check requerido tendrá el nombre estable `quality`; las aprobaciones requeridas serán cero.
-- La regla de protección todavía no está activa: primero el workflow debe formar parte de `main` para que GitHub publique el check requerido. Tras integrar esta inicialización, se configurará la protección de rama y se comprobará que un PR solo pueda integrarse cuando `quality` pase. Los workflows por sí solos no activan esta protección.
+- La regla de protección está activa en `main`: cada cambio requiere un pull request y el check `quality` debe pasar. No se exigen aprobaciones ni revisores y la regla también se aplica a administradores. La configuración de GitHub asocia el check con la app `github-actions` y exige que la rama esté actualizada antes de integrar.
 
 ### Estrategia de pruebas
 

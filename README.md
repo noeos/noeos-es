@@ -20,7 +20,7 @@ Se requieren Node.js `24.22.3` y npm `12.2.2`, fijados en `.node-version` y `pac
 
 Los checks locales y de CI son `npm run format:check`, `npm run lint`, `npm run check`, `npm run build` y `npm audit --audit-level=high`. El workflow de GitHub Actions está en `.github/workflows/ci.yml`; Dependabot revisa semanalmente las dependencias npm y las acciones. GitHub tiene activados el análisis de secretos, su bloqueo al subir y las alertas de seguridad de Dependabot.
 
-La protección de `main` con el check requerido `quality` todavía debe activarse cuando este workflow llegue a la rama remota; no se exigirán aprobaciones ni revisores.
+La rama `main` está protegida: cada cambio requiere un pull request y que pase el check `quality`. No se exigen aprobaciones ni revisores; los administradores también quedan sujetos a estas reglas.
 
 El proyecto tiene ahora el toolchain y la estructura inicial, pero todavía no contiene páginas ni comportamiento de la web. Por eso aún no hay pruebas unitarias o end-to-end; se añadirán junto al comportamiento que deban proteger.
 
