@@ -1,5 +1,5 @@
 export const en = {
-  pageTitle: 'Coming soon | Noeos',
+  pageTitle: 'Noeos',
   pageDescription: 'The Noeos website is coming soon.',
   comingSoon: 'Coming soon',
   languageNavigation: 'Language',
