@@ -8,7 +8,7 @@ La web debe comunicar una oferta clara y enlazar información técnica verificab
 
 El sitio se construirá con Astro, TypeScript y Tailwind CSS. La experiencia podrá incluir animación e interactividad refinadas, manteniendo la generación estática y añadiendo JavaScript de forma selectiva.
 
-La web estará inicialmente en español e inglés, sin CMS. Consulta [`docs/README.md`](./docs/README.md) y los ADR para conocer las decisiones de arquitectura, contenido e i18n.
+La web está inicialmente en español e inglés, sin CMS. Consulta [`docs/README.md`](./docs/README.md) y los ADR para conocer las decisiones de arquitectura, contenido e i18n.
 
 SEO, GEO, rendimiento y seguridad se consideran desde cada cambio. Las pautas están en ADR-0010 a ADR-0013. Estas prácticas reducen riesgos y mejoran la calidad, pero no garantizan rankings, indexación, citas generativas, puntuaciones perfectas ni seguridad absoluta.
 
@@ -22,7 +22,7 @@ Los checks locales y de CI son `npm run format:check`, `npm run lint`, `npm run 
 
 La rama `main` está protegida: cada cambio requiere un pull request y que pase el check `quality`. No se exigen aprobaciones ni revisores; los administradores también quedan sujetos a estas reglas.
 
-El proyecto tiene ahora el toolchain y la estructura inicial, pero todavía no contiene páginas ni comportamiento de la web. Por eso aún no hay pruebas unitarias o end-to-end; se añadirán junto al comportamiento que deban proteger.
+La base i18n está activa: `/` sirve inglés y `/es/` español, con sus diccionarios tipados y un selector entre ambas versiones. Por ahora las dos páginas solo muestran “Coming soon”/“Próximamente”; no hay más funcionalidad que probar.
 
 ## Licencia
 
