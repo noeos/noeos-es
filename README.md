@@ -18,7 +18,7 @@ Google Analytics, Search Console y otras herramientas podrán incorporarse más 
 
 Se requieren Node.js `24.22.3` y npm `12.2.2`, fijados en `.node-version` y `package.json`. Instala las dependencias con `npm ci` y ejecuta `npm run dev` para iniciar Astro.
 
-Los checks locales y de CI son `npm run format:check`, `npm run lint`, `npm run check`, `npm run build` y `npm audit --audit-level=high`. El workflow de GitHub Actions está en `.github/workflows/ci.yml`; Dependabot revisa semanalmente las dependencias npm y las acciones. GitHub tiene activados el análisis de secretos, su bloqueo al subir y las alertas de seguridad de Dependabot.
+Los checks locales y de CI son `npm run format:check`, `npm run lint`, `npm run check`, `npm run build` y `npm audit --audit-level=high`. El workflow de GitHub Actions está en `.github/workflows/ci.yml`; Dependabot revisa semanalmente las dependencias npm y las acciones. GitHub tiene activados el análisis y bloqueo de secretos al subir, y las alertas de seguridad de Dependabot. Actions solo permite acciones publicadas por GitHub y fijadas a SHA; `GITHUB_TOKEN` tiene permisos de solo lectura por defecto.
 
 La rama `main` está protegida: cada cambio requiere un pull request y que pase el check `quality`. No se exigen aprobaciones ni revisores; los administradores también quedan sujetos a estas reglas.
 
