@@ -35,8 +35,8 @@ El checkout estaba en reconstrucción y no tenía código de aplicación, `packa
 
 ### Seguridad de workflows
 
-- Los workflows declararán permisos mínimos explícitos para `GITHUB_TOKEN`; los jobs de lectura no tendrán permisos de escritura.
-- Las acciones externas se fijarán a SHA completo e inmutable, con comentario que identifique el tag o release de origen. Las actualizaciones de SHA se revisarán y probarán. Se preferirán acciones oficiales o de mantenedores confiables.
+- El permiso predeterminado de `GITHUB_TOKEN` en el repositorio será de solo lectura y GitHub Actions no podrá aprobar pull requests. Los workflows declararán los permisos mínimos explícitos; los jobs de lectura no tendrán permisos de escritura.
+- GitHub solo permite acciones publicadas por GitHub y exige que se fijen a SHA completo e inmutable. Las actualizaciones de SHA se revisarán y probarán. Si una necesidad futura requiere una acción de terceros, se justificará y se autorizará explícitamente en la configuración del repositorio.
 - Los workflows que ejecutan código de pull requests no usarán `pull_request_target` ni otros disparadores privilegiados para ejecutar ese código. No tendrán acceso a secretos de producción ni tokens con permisos de escritura.
 - Se limitará la persistencia de credenciales de checkout cuando no se necesite escribir al repositorio. No se interpolarán valores controlables por quien abre una pull request directamente en comandos de shell; se pasarán como entradas y se validarán.
 - Artefactos de informes, trazas y capturas se subirán solo cuando ayuden a diagnosticar un fallo, con retención limitada y sin datos personales, secretos o contenido sensible.
